@@ -40,5 +40,70 @@
 # methods named above.
 
 class TowersOfHanoi
+  attr_reader :towers
 
+  def initialize
+    @towers = [[3, 2, 1], [], []]
+  end
+
+  def render
+    top = render_row(2)
+    mid = render_row(1)
+    bottom = render_row(0)
+    "#{top.join(' ')}\n#{mid.join(' ')}\n#{bottom.join(' ')}\n"\
+    "___ ___ ___\n 1   2   3 "
+  end
+
+  def render_row(index)
+    towers.map do |tower|
+      if tower[index].nil?
+        '   '
+      else
+        disc = '*' * tower[index]
+        disc + ' ' * (3 - disc.length)
+      end
+    end
+  end
+
+  def play
+    until won?
+      puts render
+      get_move
+    end
+    game_won
+  end
+
+  def get_move
+    print "Enter a move (ex. from to): "
+    input = gets.chomp
+    from_tower, to_tower = input.split.map { |move| move.to_i - 1 }
+
+    if valid_move?(from_tower, to_tower)
+      move(from_tower, to_tower)
+    else
+      puts "Invalid move! Please try again."
+    end
+  end
+
+  def move(from_tower, to_tower)
+    disc = towers[from_tower].pop
+    towers[to_tower] << disc
+  end
+
+  def valid_move?(from_tower, to_tower)
+    from = towers[from_tower]
+    to = towers[to_tower]
+    return false if from.empty?
+    return false if !to.empty? && from.last > to.last
+    true
+  end
+
+  def won?
+    towers[1].length == 3 || towers[2].length == 3
+  end
+
+  def game_won
+    puts "Congratulations! You win!"
+    puts render
+  end
 end
